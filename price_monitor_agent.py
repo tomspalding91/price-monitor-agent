@@ -44,6 +44,12 @@ TRACKED_PRODUCTS: List[Dict[str, str]] = [
         "name": "Example Product B",
         "url": "https://example2.com/product_B",
     },
+        {
+            "sku": "B0DWRBVDN6",
+            "name": "Amazon Kindle Scribe Colorsoft 32GB",
+            "url": "https://www.amazon.com/dp/B0DWRBVDN6",
+        },
+
     # Add additional products here...
 ]
 
@@ -52,6 +58,7 @@ TRACKED_PRODUCTS: List[Dict[str, str]] = [
 # If `twilio.rest.Client` is not available or these values are left blank, the
 # script will print notifications to the console instead.
 TWILIO_ACCOUNT_SID: str = ""
+ 
 TWILIO_AUTH_TOKEN: str = ""
 TWILIO_FROM_NUMBER: str = ""
 TWILIO_TO_NUMBER: str = ""
