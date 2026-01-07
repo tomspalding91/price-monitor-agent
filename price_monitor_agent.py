@@ -34,22 +34,12 @@ DB_PATH = "price_history.db"
 # Products to track.  Each entry should include at least a `sku` (or other unique
 # identifier) and a `url` for the product page.  Add as many products as you like.
 TRACKED_PRODUCTS: List[Dict[str, str]] = [
-    {
-        "sku": "B08N5WRWNW",
-        "name": "Example Product A",
-        "url": "https://example.com/product_A",
-    },
-    {
-        "sku": "B09ABCDE123",
-        "name": "Example Product B",
-        "url": "https://example2.com/product_B",
-    },
+
         {
             "sku": "B0DWRBVDN6",
             "name": "Amazon Kindle Scribe Colorsoft 32GB",
             "url": "https://www.amazon.com/dp/B0DWRBVDN6",
         },
-
     # Add additional products here...
 ]
 
