@@ -24,7 +24,15 @@ try:
 except ImportError:
     Client = None  # type: ignore
 
-###############################################################################
+####### Optional: requests and BeautifulSoup for scraping Amazon
+try:
+    import requests
+    from bs4 import BeautifulSoup  # type: ignore
+except ImportError:
+    requests = None  # type: ignore
+    BeautifulSoup = None  # type: ignore
+
+#########################################################################
 # Configuration
 
 # SQLite database file used to store price history.  For production use, consider
@@ -185,6 +193,54 @@ def fetch_price_from_example(url: str) -> Dict[str, object]:
         "available": True,
         "site": "ExampleSite",
     }
+def fetch_price_from_amazon(url: str) -> Dict[str, object]:
+    """
+    Attempts to fetch price, shipping cost, availability, and site information from an Amazon product page.
+    If requests or BeautifulSoup is unavailable or an error occurs, returns dummy values.
+    """
+    # Default result in case of failure or missing libraries
+    default_result = {
+        "price": float("inf"),
+        "shipping": 0.0,
+        "available": False,
+        "site": "Amazon",
+    }
+    if requests is None or BeautifulSoup is None:
+        return default_result
+    try:
+        headers = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64)"}
+        resp = requests.get(url, headers=headers, timeout=10)
+        resp.raise_for_status()
+        soup = BeautifulSoup(resp.text, "html.parser")
+        # Attempt to locate price element using common selectors
+        price_text = None
+        selectors = [
+            "#priceblock_ourprice",
+            "#priceblock_dealprice",
+            "span.a-price > span.a-offscreen",
+            "#corePriceDisplay_desktop_feature_div span.a-offscreen",
+        ]
+        for sel in selectors:
+            el = soup.select_one(sel)
+            if el:
+                price_text = el.get_text(strip=True)
+                break
+        price = None
+        if price_text:
+            price_text = price_text.replace(",", "")
+            import re
+            match = re.search(r"([0-9]+(?:\\.[0-9]+)?)", price_text)
+            if match:
+                price = float(match.group(1))
+        return {
+            "price": price if price is not None else float("inf"),
+            "shipping": 0.0,
+            "available": True,
+            "site": "Amazon",
+        }
+    except Exception:
+        return default_result
+
 
 
 # Mapping from domain prefixes to scraping functions.  The keys should be substrings
@@ -193,6 +249,8 @@ def fetch_price_from_example(url: str) -> Dict[str, object]:
 SCRAPER_MAPPING: Dict[str, Callable[[str], Dict[str, object]]] = {
     "example.com": fetch_price_from_example,
     "example2.com": fetch_price_from_example,
+        "amazon.com": fetch_price_from_amazon,
+
     # Add real domain-specific functions here...
 }
 
